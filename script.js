@@ -809,7 +809,7 @@ function setupAnimation(plaintext, strips, offset) {
         const charWidth = 30;
         const viewportWidth = animationDiv.clientWidth || 800;
         const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - 80; // -80 for strip label
-        const initialTranslateX = centerPosition - (alignPos * charWidth);
+        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
         contentDiv.style.transform = `translateX(${initialTranslateX}px)`;
         
         stripDiv.appendChild(contentDiv);
@@ -963,7 +963,7 @@ function resetAnimation() {
         const viewportWidth = strip.parentElement.parentElement.clientWidth || 800;
         const offset = parseInt(content.dataset.offset);
         const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - 80;
-        const initialTranslateX = centerPosition - (alignPos * charWidth);
+        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
         content.style.transform = `translateX(${initialTranslateX}px)`;
         content.style.transition = 'transform 0.3s ease';
         content.dataset.animated = 'false';
@@ -1064,7 +1064,7 @@ function setupDecryptAnimation(ciphertext, plaintext, strips, offset) {
         const viewportWidth = animationDiv.clientWidth || 800;
         const centerPosition = (viewportWidth / 2) - 80; // -80 for strip label
         const cipherPos = alignPos + offset;
-        const initialTranslateX = centerPosition - (alignPos * charWidth);
+        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
         contentDiv.style.transform = `translateX(${initialTranslateX}px)`;
         
         stripDiv.appendChild(contentDiv);
@@ -1213,7 +1213,7 @@ function resetDecryptAnimation() {
         // Reset to initial centered position
         const viewportWidth = strip.parentElement.parentElement.clientWidth || 800;
         const centerPosition = (viewportWidth / 2) - 80;
-        const initialTranslateX = centerPosition - (alignPos * charWidth);
+        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
         content.style.transform = `translateX(${initialTranslateX}px)`;
         content.style.transition = 'transform 0.3s ease';
         content.dataset.animated = 'false';
