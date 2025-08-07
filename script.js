@@ -805,9 +805,11 @@ function setupAnimation(plaintext, strips, offset) {
         contentDiv.dataset.offset = offset;
         contentDiv.dataset.animated = 'false';
         
-        // Apply initial transform to show alignment
+        // Apply initial transform to center the plaintext character under P indicator
         const charWidth = 30;
-        const initialTranslateX = -alignPos * charWidth;
+        const viewportWidth = animationDiv.clientWidth || 800;
+        const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - 80; // -80 for strip label
+        const initialTranslateX = centerPosition - (alignPos * charWidth);
         contentDiv.style.transform = `translateX(${initialTranslateX}px)`;
         
         stripDiv.appendChild(contentDiv);
@@ -829,10 +831,14 @@ function setupAnimation(plaintext, strips, offset) {
     indicatorContainer.style.justifyContent = 'center';
     indicatorContainer.style.paddingLeft = '80px'; // Account for strip labels
     
-    // Create indicator group positioned to match the pre-aligned strips
+    // Create indicator group centered in viewport
     const centerGroup = document.createElement('div');
     centerGroup.style.position = 'absolute';
-    centerGroup.style.left = '200px'; // Shifted right for better centering
+    const viewportWidth = animationDiv.clientWidth || 800;
+    const stripLabelWidth = 80;
+    const charWidth = 30;
+    const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2);
+    centerGroup.style.left = `${centerPosition}px`;
     centerGroup.style.width = '100%';
     
     const plaintextIndicator = document.createElement('div');
@@ -929,37 +935,20 @@ function animateStripInstantly(strip, index) {
     // Mark as animated
     content.dataset.animated = 'true';
     
-    // Set up the animation transition
-    content.style.transition = 'transform 0.8s ease';
-    
     // Step 1: Highlight plaintext position first
     const plaintextCell = content.children[alignPos];
     if (plaintextCell && plaintextCell.classList.contains('strip-char')) {
         plaintextCell.classList.add('plaintext-highlight');
     }
     
-    // Step 2: Slide to show the relationship better
+    // Step 2: Highlight cipher position after a delay
     setTimeout(() => {
-        // Calculate a better position that shows both plaintext and cipher
-        const charWidth = 30;
-        const viewportWidth = strip.parentElement.parentElement.clientWidth || 800;
-        const stripLabelWidth = 80;
-        const availableWidth = viewportWidth - stripLabelWidth;
-        
-        // Position to show both characters well
-        const idealOffset = Math.min(alignPos * charWidth - 100, alignPos * charWidth);
-        const translateX = -idealOffset;
-        content.style.transform = `translateX(${translateX}px)`;
-        
-        // Step 3: Highlight cipher position after slide
-        setTimeout(() => {
-            const cipherPos = alignPos + offset;
-            const cipherCell = content.children[cipherPos];
-            if (cipherCell && cipherCell.classList.contains('strip-char')) {
-                cipherCell.classList.add('cipher-highlight');
-            }
-        }, 800);
-    }, 300);
+        const cipherPos = alignPos + offset;
+        const cipherCell = content.children[cipherPos];
+        if (cipherCell && cipherCell.classList.contains('strip-char')) {
+            cipherCell.classList.add('cipher-highlight');
+        }
+    }, 500);
 }
 
 function resetAnimation() {
@@ -970,8 +959,11 @@ function resetAnimation() {
         const alignPos = parseInt(content.dataset.alignPos);
         const charWidth = 30;
         
-        // Reset to initial aligned position
-        const initialTranslateX = -alignPos * charWidth;
+        // Reset to initial centered position
+        const viewportWidth = strip.parentElement.parentElement.clientWidth || 800;
+        const offset = parseInt(content.dataset.offset);
+        const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - 80;
+        const initialTranslateX = centerPosition - (alignPos * charWidth);
         content.style.transform = `translateX(${initialTranslateX}px)`;
         content.style.transition = 'transform 0.3s ease';
         content.dataset.animated = 'false';
@@ -1067,12 +1059,12 @@ function setupDecryptAnimation(ciphertext, plaintext, strips, offset) {
         contentDiv.dataset.offset = offset;
         contentDiv.dataset.animated = 'false';
         
-        // Apply initial transform to show cipher character aligned under C indicator
-        // The cipher character is at position (alignPos + offset) in the strip
-        // We want it to appear at visual position 'offset'
+        // Apply initial transform to center the cipher character under C indicator
         const charWidth = 30;
+        const viewportWidth = animationDiv.clientWidth || 800;
+        const centerPosition = (viewportWidth / 2) - 80; // -80 for strip label
         const cipherPos = alignPos + offset;
-        const initialTranslateX = -(cipherPos - offset) * charWidth;
+        const initialTranslateX = centerPosition - (alignPos * charWidth);
         contentDiv.style.transform = `translateX(${initialTranslateX}px)`;
         
         stripDiv.appendChild(contentDiv);
@@ -1094,10 +1086,13 @@ function setupDecryptAnimation(ciphertext, plaintext, strips, offset) {
     indicatorContainer.style.justifyContent = 'center';
     indicatorContainer.style.paddingLeft = '80px'; // Account for strip labels
     
-    // Create indicator group positioned correctly for decryption
+    // Create indicator group centered in viewport
     const centerGroup = document.createElement('div');
     centerGroup.style.position = 'absolute';
-    centerGroup.style.left = '200px'; // Shifted right for better centering
+    const viewportWidth = animationDiv.clientWidth || 800;
+    const charWidth = 30;
+    const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2);
+    centerGroup.style.left = `${centerPosition}px`;
     centerGroup.style.width = '100%';
     
     const cipherIndicator = document.createElement('div');
@@ -1215,9 +1210,10 @@ function resetDecryptAnimation() {
         const offset = parseInt(content.dataset.offset);
         const charWidth = 30;
         
-        // Reset to initial aligned position (cipher character under C indicator)
-        const cipherPos = alignPos + offset;
-        const initialTranslateX = -(cipherPos - offset) * charWidth;
+        // Reset to initial centered position
+        const viewportWidth = strip.parentElement.parentElement.clientWidth || 800;
+        const centerPosition = (viewportWidth / 2) - 80;
+        const initialTranslateX = centerPosition - (alignPos * charWidth);
         content.style.transform = `translateX(${initialTranslateX}px)`;
         content.style.transition = 'transform 0.3s ease';
         content.dataset.animated = 'false';
