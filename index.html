@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M-138 Cipher Tool</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>M-138 Cipher Tool</h1>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="encrypt">Encrypt</button>
+            <button class="tab-button" data-tab="decrypt">Decrypt</button>
+        </div>
+
+        <!-- Encryption Tab -->
+        <div id="encrypt" class="tab-content active">
+            <h2>Encryption</h2>
+            
+            <!-- Step 1: Strip and Offset Selection -->
+            <div class="step-section">
+                <h3>Step 1: Select Strips and Offset</h3>
+                
+                <div class="form-group">
+                    <label>Select and Order 25 Strips:</label>
+                    <button id="randomStrips" class="btn-secondary">Choose Random Order</button>
+                    <button id="sequentialStrips" class="btn-secondary">Use 1-25 in Order</button>
+                    <div class="strip-order-container">
+                        <div class="available-strips">
+                            <h4>Available Strips</h4>
+                            <div id="stripSelection" class="strip-selection"></div>
+                        </div>
+                        <div class="selected-strips">
+                            <h4>Selected Order <span class="selected-count">(<span id="selectedCount">0</span>/25)</span></h4>
+                            <div id="orderedStrips" class="ordered-strips"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="offset">Offset:</label>
+                    <div class="offset-control">
+                        <div class="dial-container">
+                            <canvas id="offsetDial" width="150" height="150"></canvas>
+                            <div class="dial-value" id="dialValue">0</div>
+                        </div>
+                        <input type="hidden" id="offset" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Plaintext Input -->
+            <div class="step-section">
+                <h3>Step 2: Enter Plaintext</h3>
+                <div class="form-group">
+                    <label for="plaintext">Plaintext:</label>
+                    <textarea id="plaintext" rows="4" placeholder="Enter message to encrypt..."></textarea>
+                </div>
+                <button id="encryptBtn" class="btn-primary">Encrypt</button>
+            </div>
+
+            <!-- Step 3: View Ciphertext -->
+            <div id="step3Container" class="step-section" style="display: none;">
+                <h3>Step 3: View Ciphertext</h3>
+                
+                <!-- Animation Container -->
+                <div id="animationContainer" class="animation-container">
+                    <h4>Encryption Visualization</h4>
+                    <div class="animation-controls">
+                        <button id="resetAnimation" class="btn-secondary">Reset</button>
+                        <span class="scroll-hint">Scroll right to see more →</span>
+                    </div>
+                    <div id="stripAnimation" class="strip-animation"></div>
+                    <div class="legend">
+                        <span class="legend-item"><span class="legend-box plaintext-col"></span>Plaintext Column</span>
+                        <span class="legend-item"><span class="legend-box cipher-col"></span>Ciphertext Column</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ciphertext">Ciphertext:</label>
+                    <textarea id="ciphertext" rows="4" readonly placeholder="Encrypted message will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decryption Tab -->
+        <div id="decrypt" class="tab-content">
+            <h2>Decryption</h2>
+            
+            <!-- Step 1: Strip and Offset Selection -->
+            <div class="step-section">
+                <h3>Step 1: Select Strips and Offset</h3>
+                <button id="copyFromEncryption" class="btn-secondary" style="margin-bottom: 15px;">Copy Key from Encryption</button>
+                
+                <div class="form-group">
+                    <label>Select and Order 25 Strips:</label>
+                    <button id="randomStripsDecrypt" class="btn-secondary">Choose Random Order</button>
+                    <button id="sequentialStripsDecrypt" class="btn-secondary">Use 1-25 in Order</button>
+                    <div class="strip-order-container">
+                        <div class="available-strips">
+                            <h4>Available Strips</h4>
+                            <div id="stripSelectionDecrypt" class="strip-selection"></div>
+                        </div>
+                        <div class="selected-strips">
+                            <h4>Selected Order <span class="selected-count">(<span id="selectedCountDecrypt">0</span>/25)</span></h4>
+                            <div id="orderedStripsDecrypt" class="ordered-strips"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="offsetDecrypt">Offset:</label>
+                    <div class="offset-control">
+                        <div class="dial-container">
+                            <canvas id="offsetDialDecrypt" width="150" height="150"></canvas>
+                            <div class="dial-value" id="dialValueDecrypt">0</div>
+                        </div>
+                        <input type="hidden" id="offsetDecrypt" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Ciphertext Input -->
+            <div class="step-section">
+                <h3>Step 2: Enter Ciphertext</h3>
+                <div class="form-group">
+                    <label for="ciphertext-input">Ciphertext:</label>
+                    <textarea id="ciphertext-input" rows="4" placeholder="Enter message to decrypt..."></textarea>
+                </div>
+                <button id="decryptBtn" class="btn-primary">Decrypt</button>
+            </div>
+
+            <!-- Step 3: View Plaintext -->
+            <div id="step3ContainerDecrypt" class="step-section" style="display: none;">
+                <h3>Step 3: View Plaintext</h3>
+                
+                <!-- Animation Container -->
+                <div id="animationContainerDecrypt" class="animation-container">
+                    <h4>Decryption Visualization</h4>
+                    <div class="animation-controls">
+                        <button id="resetAnimationDecrypt" class="btn-secondary">Reset</button>
+                        <span class="scroll-hint">Scroll right to see more →</span>
+                    </div>
+                    <div id="stripAnimationDecrypt" class="strip-animation"></div>
+                    <div class="legend">
+                        <span class="legend-item"><span class="legend-box cipher-col"></span>Ciphertext Column</span>
+                        <span class="legend-item"><span class="legend-box plaintext-col"></span>Plaintext Column</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="plaintext-output">Plaintext:</label>
+                    <textarea id="plaintext-output" rows="4" readonly placeholder="Decrypted message will appear here..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
