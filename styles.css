@@ -374,6 +374,23 @@ input[type="number"] {
 }
 
 /* Mobile Responsive */
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+    .strip-checkbox:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    .btn-primary:active,
+    .btn-secondary:active {
+        transform: scale(0.98);
+    }
+    
+    .ordered-strip:active {
+        transform: scale(0.95);
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -422,10 +439,167 @@ input[type="number"] {
         font-size: 12px;
     }
     
+    /* Animation optimizations for mobile */
+    .animation-container {
+        padding: 15px;
+        margin: 20px 0;
+    }
+    
+    .strip-animation {
+        padding: 10px;
+    }
+    
+    .scroll-wrapper {
+        max-height: 300px;
+    }
+    
+    .strips-container {
+        padding-top: 40px;
+    }
+    
+    .animated-strip {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    
     .strip-label {
-        width: 60px;
-        font-size: 12px;
+        width: 50px;
+        font-size: 11px;
         padding-right: 5px;
+        background-color: rgba(255, 255, 255, 0.98);
+        z-index: 20;
+    }
+    
+    .strip-char {
+        width: 22px;
+        height: 26px;
+        font-size: 12px;
+        margin-right: 1px;
+    }
+    
+    /* Move strip label down to avoid covering plaintext */
+    .strip-label {
+        margin-top: 8px;
+        box-shadow: none; /* Remove shadow on mobile for cleaner look */
+        border-right: 1px solid #e0e0e0; /* Thinner border on mobile */
+    }
+    
+    /* Ensure indicators don't overlap on mobile */
+    .strips-container {
+        padding-top: 35px; /* Reduced padding on mobile */
+    }
+    
+    /* Position indicators above strip labels */
+    .column-indicator {
+        z-index: 25; /* Higher than strip labels */
+    }
+    
+    /* Adjust column indicators for mobile */
+    .column-indicator {
+        font-size: 12px;
+        width: 24px;
+        top: 5px;
+    }
+    
+    /* Reduce animation movement for performance */
+    .strip-content {
+        transition: transform 0.3s ease;
+    }
+    
+    .animated-strip {
+        transition: transform 0.3s ease;
+    }
+    
+    /* Optimize legend for mobile */
+    .legend {
+        font-size: 12px;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .legend-box {
+        width: 16px;
+        height: 16px;
+    }
+    
+    /* Reduce button sizes */
+    .btn-primary,
+    .btn-secondary {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    /* Optimize form elements */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    textarea {
+        font-size: 13px;
+        padding: 10px;
+        min-height: 80px; /* Reduce minimum height on mobile */
+    }
+    
+    /* Strip order container optimization */
+    .strip-order-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .ordered-strip {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+    
+    /* Step sections optimization */
+    .step-section {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .step-section h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    
+    /* Optimize dial for mobile */
+    .dial-container {
+        width: 120px;
+        height: 120px;
+    }
+    
+    #offsetDial,
+    #offsetDialDecrypt {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .dial-value {
+        font-size: 20px;
+    }
+    
+    /* Optimize strip selection grid */
+    .available-strips,
+    .selected-strips {
+        padding: 10px;
+    }
+    
+    .available-strips h4,
+    .selected-strips h4 {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    /* Ensure scroll hint is visible on mobile */
+    .scroll-hint {
+        font-size: 12px;
+        color: #999;
+    }
+    
+    /* Optimize animation controls */
+    .animation-controls {
+        gap: 10px;
     }
 }
 
@@ -629,6 +803,19 @@ input[type="number"] {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+/* Mobile-specific animation performance */
+@media (max-width: 768px) {
+    .strip-char.cipher-highlight {
+        animation: none;
+        transform: scale(1.05);
+    }
+    
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+    }
 }
 
 /* Column indicators */

@@ -51,7 +51,29 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDecryption();
     initializeCopyKey();
     initializePWA();
+    
+    // Handle orientation changes on mobile
+    window.addEventListener('resize', handleResize);
 });
+
+// Handle window resize events
+let resizeTimeout;
+function handleResize() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        // Re-center animations if they exist
+        const animationContainers = document.querySelectorAll('.strip-animation');
+        animationContainers.forEach(container => {
+            if (container.innerHTML) {
+                // Trigger a reset to recalculate positions
+                const resetBtn = container.closest('.animation-container').querySelector('button[id*="reset"]');
+                if (resetBtn) {
+                    resetBtn.click();
+                }
+            }
+        });
+    }, 250);
+}
 
 // Tab functionality
 function initializeTabs() {
@@ -201,9 +223,15 @@ function initializeOffsetDial() {
     let isDragging = false;
     
     function drawDial(value) {
+        // Adjust canvas size for mobile
+        if (isMobile() && canvas.width !== 120) {
+            canvas.width = 120;
+            canvas.height = 120;
+        }
+        
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        const radius = 60;
+        const radius = isMobile() ? 45 : 60;
         
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -336,9 +364,15 @@ function initializeOffsetDialDecrypt() {
     let isDragging = false;
     
     function drawDial(value) {
+        // Adjust canvas size for mobile
+        if (isMobile() && canvas.width !== 120) {
+            canvas.width = 120;
+            canvas.height = 120;
+        }
+        
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        const radius = 60;
+        const radius = isMobile() ? 45 : 60;
         
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -739,6 +773,11 @@ let animatedStrips = [];
 let animatedOffset = 0;
 let scrollPosition = 0;
 
+// Mobile detection
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
 function setupAnimation(plaintext, strips, offset) {
     const animationDiv = document.getElementById('stripAnimation');
     
@@ -806,10 +845,12 @@ function setupAnimation(plaintext, strips, offset) {
         contentDiv.dataset.animated = 'false';
         
         // Apply initial transform to center the plaintext character under P indicator
-        const charWidth = 30;
+        const charWidth = isMobile() ? 23 : 30;
+        const stripLabelWidth = isMobile() ? 50 : 80;
         const viewportWidth = animationDiv.clientWidth || 800;
-        const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - 80; // -80 for strip label
-        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
+        const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - stripLabelWidth;
+        const leftShift = isMobile() ? -48 : -96; // -48px (0.5 inch) on mobile, -96px (1 inch) on desktop
+        const initialTranslateX = centerPosition - (alignPos * charWidth) + leftShift;
         contentDiv.style.transform = `translateX(${initialTranslateX}px)`;
         
         stripDiv.appendChild(contentDiv);
@@ -835,23 +876,23 @@ function setupAnimation(plaintext, strips, offset) {
     const centerGroup = document.createElement('div');
     centerGroup.style.position = 'absolute';
     const viewportWidth = animationDiv.clientWidth || 800;
-    const stripLabelWidth = 80;
-    const charWidth = 30;
+    const stripLabelWidth = isMobile() ? 50 : 80;
+    const charWidth = isMobile() ? 23 : 30;
     const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2);
     centerGroup.style.left = `${centerPosition}px`;
     centerGroup.style.width = '100%';
     
     const plaintextIndicator = document.createElement('div');
     plaintextIndicator.className = 'column-indicator plaintext-indicator';
-    plaintextIndicator.textContent = '↓ P';
+    plaintextIndicator.textContent = isMobile() ? 'P' : '↓ P';
     plaintextIndicator.style.left = '0px';
     plaintextIndicator.style.position = 'absolute';
     centerGroup.appendChild(plaintextIndicator);
     
     const cipherIndicator = document.createElement('div');
     cipherIndicator.className = 'column-indicator cipher-indicator';
-    cipherIndicator.textContent = '↓ C';
-    cipherIndicator.style.left = `${offset * 30}px`;
+    cipherIndicator.textContent = isMobile() ? 'C' : '↓ C';
+    cipherIndicator.style.left = `${offset * charWidth}px`;
     cipherIndicator.style.position = 'absolute';
     centerGroup.appendChild(cipherIndicator);
     
@@ -874,14 +915,15 @@ function setupAnimation(plaintext, strips, offset) {
 
 function handleScroll(event) {
     const scrollLeft = event.target.scrollLeft || 0;
-    const stripWidth = 80; // Width of strip label
-    const charWidth = 30; // Width of each character cell
+    const stripWidth = isMobile() ? 50 : 80; // Width of strip label
+    const charWidth = isMobile() ? 23 : 30; // Width of each character cell
     const viewportWidth = event.target.clientWidth || 800;
     
     
     // Calculate which strips should be visible based on viewport with buffer
-    const startChar = Math.max(0, Math.floor((scrollLeft - stripWidth) / charWidth) - 5);
-    const endChar = Math.min(Math.ceil((scrollLeft + viewportWidth) / charWidth) + 5, animatedPlaintext.length);
+    const bufferSize = isMobile() ? 3 : 5; // Reduced buffer on mobile for performance
+    const startChar = Math.max(0, Math.floor((scrollLeft - stripWidth) / charWidth) - bufferSize);
+    const endChar = Math.min(Math.ceil((scrollLeft + viewportWidth) / charWidth) + bufferSize, animatedPlaintext.length);
     
     // Update visible strips and animate when they reach center
     const strips = document.querySelectorAll('.animated-strip');
@@ -957,13 +999,15 @@ function resetAnimation() {
     strips.forEach((strip, index) => {
         const content = strip.querySelector('.strip-content');
         const alignPos = parseInt(content.dataset.alignPos);
-        const charWidth = 30;
+        const charWidth = isMobile() ? 23 : 30;
+        const stripLabelWidth = isMobile() ? 50 : 80;
         
         // Reset to initial centered position
         const viewportWidth = strip.parentElement.parentElement.clientWidth || 800;
         const offset = parseInt(content.dataset.offset);
-        const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - 80;
-        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
+        const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2) - stripLabelWidth;
+        const leftShift = isMobile() ? -48 : -96; // -48px on mobile, -96px on desktop
+        const initialTranslateX = centerPosition - (alignPos * charWidth) + leftShift;
         content.style.transform = `translateX(${initialTranslateX}px)`;
         content.style.transition = 'transform 0.3s ease';
         content.dataset.animated = 'false';
@@ -1060,11 +1104,13 @@ function setupDecryptAnimation(ciphertext, plaintext, strips, offset) {
         contentDiv.dataset.animated = 'false';
         
         // Apply initial transform to center the cipher character under C indicator
-        const charWidth = 30;
+        const charWidth = isMobile() ? 23 : 30;
+        const stripLabelWidth = isMobile() ? 50 : 80;
         const viewportWidth = animationDiv.clientWidth || 800;
-        const centerPosition = (viewportWidth / 2) - 80; // -80 for strip label
+        const centerPosition = (viewportWidth / 2) - stripLabelWidth;
         const cipherPos = alignPos + offset;
-        const initialTranslateX = centerPosition - (alignPos * charWidth) - 96; // -96 to shift left 1 inch
+        const leftShift = isMobile() ? -48 : -96; // -48px on mobile, -96px on desktop
+        const initialTranslateX = centerPosition - (alignPos * charWidth) + leftShift;
         contentDiv.style.transform = `translateX(${initialTranslateX}px)`;
         
         stripDiv.appendChild(contentDiv);
@@ -1090,21 +1136,21 @@ function setupDecryptAnimation(ciphertext, plaintext, strips, offset) {
     const centerGroup = document.createElement('div');
     centerGroup.style.position = 'absolute';
     const viewportWidth = animationDiv.clientWidth || 800;
-    const charWidth = 30;
+    const charWidth = isMobile() ? 23 : 30;
     const centerPosition = (viewportWidth / 2) - (offset * charWidth / 2);
     centerGroup.style.left = `${centerPosition}px`;
     centerGroup.style.width = '100%';
     
     const cipherIndicator = document.createElement('div');
     cipherIndicator.className = 'column-indicator cipher-indicator';
-    cipherIndicator.textContent = '↓ C';
-    cipherIndicator.style.left = `${offset * 30}px`;
+    cipherIndicator.textContent = isMobile() ? 'C' : '↓ C';
+    cipherIndicator.style.left = `${offset * charWidth}px`;
     cipherIndicator.style.position = 'absolute';
     centerGroup.appendChild(cipherIndicator);
     
     const plaintextIndicator = document.createElement('div');
     plaintextIndicator.className = 'column-indicator plaintext-indicator';
-    plaintextIndicator.textContent = '↓ P';
+    plaintextIndicator.textContent = isMobile() ? 'P' : '↓ P';
     plaintextIndicator.style.left = '0px';
     plaintextIndicator.style.position = 'absolute';
     centerGroup.appendChild(plaintextIndicator);
@@ -1128,13 +1174,14 @@ function setupDecryptAnimation(ciphertext, plaintext, strips, offset) {
 
 function handleDecryptScroll(event) {
     const scrollLeft = event.target.scrollLeft;
-    const stripWidth = 80; // Width of strip label
-    const charWidth = 30; // Width of each character cell
+    const stripWidth = isMobile() ? 50 : 80; // Width of strip label
+    const charWidth = isMobile() ? 23 : 30; // Width of each character cell
     const viewportWidth = event.target.clientWidth;
     
     // Calculate which strips should be visible based on viewport with buffer
-    const startChar = Math.max(0, Math.floor((scrollLeft - stripWidth) / charWidth) - 5);
-    const endChar = Math.min(Math.ceil((scrollLeft + viewportWidth) / charWidth) + 5, animatedPlaintext.length);
+    const bufferSize = isMobile() ? 3 : 5; // Reduced buffer on mobile
+    const startChar = Math.max(0, Math.floor((scrollLeft - stripWidth) / charWidth) - bufferSize);
+    const endChar = Math.min(Math.ceil((scrollLeft + viewportWidth) / charWidth) + bufferSize, animatedPlaintext.length);
     
     // Update visible strips and animate when they reach center
     const strips = event.target.closest('.animation-container').querySelectorAll('.animated-strip');
@@ -1144,16 +1191,8 @@ function handleDecryptScroll(event) {
             const content = strip.querySelector('.strip-content');
             
             if (content.dataset.animated === 'false') {
-                // Calculate strip position
-                const stripLeft = (index * charWidth) + stripWidth;
-                
-                // Check if strip is visible in viewport
-                // Animate when strip enters from the right side of viewport
-                if (stripLeft >= scrollLeft && stripLeft <= scrollLeft + viewportWidth) {
-                    // Add a small delay based on position for staggered effect
-                    const delay = Math.min((stripLeft - scrollLeft) / viewportWidth * 200, 200);
-                    setTimeout(() => animateDecryptStripInstantly(strip, index), delay);
-                }
+                // Animate immediately for better mobile performance
+                animateDecryptStripInstantly(strip, index);
             }
         } else {
             strip.style.display = 'none';
