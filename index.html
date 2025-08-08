@@ -37,18 +37,19 @@
                         <div class="selected-strips">
                             <h4>Selected Order <span class="selected-count">(<span id="selectedCount">0</span>/25)</span></h4>
                             <div id="orderedStrips" class="ordered-strips"></div>
+                            
+                            <!-- Offset control moved here -->
+                            <div class="offset-section">
+                                <h4>Offset</h4>
+                                <div class="offset-control">
+                                    <div class="dial-container">
+                                        <canvas id="offsetDial" width="150" height="150"></canvas>
+                                        <div class="dial-value" id="dialValue">0</div>
+                                    </div>
+                                    <input type="hidden" id="offset" value="0">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="offset">Offset:</label>
-                    <div class="offset-control">
-                        <div class="dial-container">
-                            <canvas id="offsetDial" width="150" height="150"></canvas>
-                            <div class="dial-value" id="dialValue">0</div>
-                        </div>
-                        <input type="hidden" id="offset" value="0">
                     </div>
                 </div>
             </div>
@@ -109,18 +110,19 @@
                         <div class="selected-strips">
                             <h4>Selected Order <span class="selected-count">(<span id="selectedCountDecrypt">0</span>/25)</span></h4>
                             <div id="orderedStripsDecrypt" class="ordered-strips"></div>
+                            
+                            <!-- Offset control moved here -->
+                            <div class="offset-section">
+                                <h4>Offset</h4>
+                                <div class="offset-control">
+                                    <div class="dial-container">
+                                        <canvas id="offsetDialDecrypt" width="150" height="150"></canvas>
+                                        <div class="dial-value" id="dialValueDecrypt">0</div>
+                                    </div>
+                                    <input type="hidden" id="offsetDecrypt" value="0">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="offsetDecrypt">Offset:</label>
-                    <div class="offset-control">
-                        <div class="dial-container">
-                            <canvas id="offsetDialDecrypt" width="150" height="150"></canvas>
-                            <div class="dial-value" id="dialValueDecrypt">0</div>
-                        </div>
-                        <input type="hidden" id="offsetDecrypt" value="0">
                     </div>
                 </div>
             </div>
